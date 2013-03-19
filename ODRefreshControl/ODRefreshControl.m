@@ -32,6 +32,8 @@
 @property (nonatomic, assign) UIScrollView *scrollView;
 @property (nonatomic, assign) UIEdgeInsets originalContentInset;
 
+@property (nonatomic, assign) BOOL touchUpOutsideActionSent;
+
 @end
 
 @implementation ODRefreshControl
@@ -178,6 +180,13 @@ static inline CGFloat lerp(CGFloat a, CGFloat b, CGFloat p)
     }
 
     CGFloat offset = [[change objectForKey:@"new"] CGPointValue].y + self.originalContentInset.top;
+    
+    if (self.scrollView.dragging) {
+        self.touchUpOutsideActionSent = NO;
+    } else if (!self.touchUpOutsideActionSent) {
+        self.touchUpOutsideActionSent = YES;
+        [self sendActionsForControlEvents:UIControlEventTouchUpOutside];
+    }
     
     if (_refreshing) {
         if (offset != 0) {
